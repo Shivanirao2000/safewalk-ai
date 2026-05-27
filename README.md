@@ -2,7 +2,11 @@
 
 > **Real-Time AI Voice Safety Companion** — Winner of "Most Likely to Become a Startup" at AthenaHacks (USC)
 
-[![Demo Video](https://img.shields.io/badge/▶_Watch_Demo-red?style=for-the-badge)](YOUR_DEMO_VIDEO_LINK_HERE)
+
+
+https://github.com/user-attachments/assets/3dd2780a-a534-45ae-b1a3-6668bbce4792
+
+
 
 SafeWalk is a real-time safety application that uses voice AI to keep users safe during walks. It listens to a live conversation, detects distress signals from speech, and automatically sends emergency alerts with GPS coordinates to a trusted contact when danger is detected.
 
@@ -135,12 +139,51 @@ The SafeWalk agent is configured in ElevenLabs Conversational AI with a custom s
 
 ## Setup & Running
 
-### Prerequisites
-- Python 3.12+
-- MongoDB (local or Atlas)
-- API keys for ElevenLabs, Google Gemini, Gmail
+### 1. Clone the repo
 
-### Environment Variables
+```bash
+git clone https://github.com/Shivanirao2000/safewalk-ai.git
+cd safewalk-ai
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+### 3. Get API Keys
+
+**MongoDB**
+- Local: [Install MongoDB Community](https://www.mongodb.com/docs/manual/installation/) and run `brew services start mongodb-community`
+- Cloud: Create a free M0 cluster at [cloud.mongodb.com](https://cloud.mongodb.com) and copy the connection string
+
+**Google Gemini**
+- Go to [aistudio.google.com](https://aistudio.google.com)
+- Click **Get API key** → Create API key in a new project
+- Copy the key
+
+**ElevenLabs**
+- Sign up at [elevenlabs.io](https://elevenlabs.io)
+- Go to **Conversational AI** → **Create Agent** → **Blank template**
+- Set the system prompt (see [ElevenLabs Agent Setup](#elevenlabs-agent-setup) below)
+- Set first message: `Hey! I'm here with you on your walk. How are you feeling tonight?`
+- Click **Publish** — copy the Agent ID from the URL bar
+- Go to **Profile → API Keys** → create a key and copy it
+
+**Gmail App Password**
+- Enable 2-Factor Authentication on your Google account at [myaccount.google.com/security](https://myaccount.google.com/security)
+- Go to [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+- Type `SafeWalk` as the app name → click **Create**
+- Copy the 16-character password (no spaces)
+
+### 4. Configure environment variables
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env` with your keys:
 
 ```env
 MONGO_URI=mongodb://localhost:27017
@@ -148,23 +191,29 @@ GEMINI_API_KEY=your_gemini_key
 ELEVENLABS_API_KEY=your_elevenlabs_key
 ELEVENLABS_AGENT_ID=agent_xxxxxxxxxxxxxxxx
 GMAIL_USER=your_gmail@gmail.com
-GMAIL_APP_PASSWORD=your_16_char_app_password
+GMAIL_APP_PASSWORD=xxxxxxxxxxxxxxxx
 EMERGENCY_CONTACT_EMAIL=contact@example.com
 ```
 
-### Run
+### 5. Run
+
+Open two terminal windows:
 
 ```bash
 # Terminal 1 — Backend
-cd backend
+cd safewalk-ai/backend
 uvicorn main:app --reload --port 8000
+```
 
+```bash
 # Terminal 2 — Frontend
-cd frontend
+cd safewalk-ai/frontend
 python -m http.server 3000
 ```
 
-Open `http://localhost:3000/index.html`
+Open `http://localhost:3000/index.html` in Chrome.
+
+> **Note:** Allow microphone and location access when prompted by the browser.
 
 ---
 

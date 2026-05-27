@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+websockets
+motor
+pymongo
+python-dotenv
+google-genai
+twilio
+httpx
+pydantic

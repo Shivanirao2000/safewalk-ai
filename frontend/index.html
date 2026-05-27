@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>SafeWalk AI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ============================================================
+       SCREEN 1: SETUP
+  ============================================================ -->
+  <section id="screen-setup" class="screen active">
+    <div class="setup-hero">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="3"/>
+          <path d="M24 12 C18 18 14 22 14 27 a10 10 0 0 0 20 0 C34 22 30 18 24 12Z"
+                fill="currentColor" opacity="0.25"/>
+          <circle cx="24" cy="27" r="4" fill="currentColor"/>
+          <line x1="24" y1="12" x2="24" y2="16" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="logo-title">SafeWalk</h1>
+      <p class="logo-sub">AI-powered safety companion</p>
+    </div>
+
+    <form id="setup-form" novalidate>
+      <div class="field-group">
+        <label for="input-name">Your name</label>
+        <input
+          id="input-name"
+          type="text"
+          placeholder="e.g. Alex"
+          autocomplete="given-name"
+          required
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="input-contact">Emergency contact email</label>
+        <input
+          id="input-contact"
+          type="email"
+          placeholder="example@email.com"
+          autocomplete="email"
+          required
+        />
+        <span class="field-hint">Will receive an email if you need help</span>
+      </div>
+
+      <div class="field-group">
+        <label>Your location</label>
+        <button id="btn-location" type="button" class="btn btn-outline btn-location">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10
+                 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+          </svg>
+          Share My Location
+        </button>
+        <p id="location-status" class="location-status" aria-live="polite"></p>
+      </div>
+
+      <button id="btn-start" type="button" class="btn btn-primary btn-start" disabled>
+        Start SafeWalk
+      </button>
+    </form>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2: ACTIVE WALK
+  ============================================================ -->
+  <section id="screen-active" class="screen" hidden>
+    <!-- Status bar -->
+    <header class="active-header">
+      <div id="status-indicator" class="status-indicator status-safe" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-label">Safe</span>
+      </div>
+      <div id="conn-indicator" class="conn-status">
+        <span class="conn-dot" aria-hidden="true"></span>
+        <span id="conn-label">Connecting…</span>
+      </div>
+    </header>
+
+    <!-- Microphone visual -->
+    <div class="mic-container" aria-label="Voice activity">
+      <div id="mic-rings" class="mic-rings" aria-hidden="true">
+        <div class="mic-ring ring-3"></div>
+        <div class="mic-ring ring-2"></div>
+        <div class="mic-ring ring-1"></div>
+      </div>
+      <div id="mic-icon" class="mic-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06
+                   A9 9 0 0 0 21 12v-2h-2z"/>
+        </svg>
+      </div>
+    </div>
+    <p id="mic-label" class="mic-label">SafeWalk is listening…</p>
+
+    <!-- Distress meter -->
+    <div class="distress-meter" role="meter" aria-label="Distress level"
+         aria-valuenow="0" aria-valuemin="0" aria-valuemax="5">
+      <div class="distress-header">
+        <span class="distress-title">Distress level</span>
+        <span id="distress-value" class="distress-value">0 / 5</span>
+      </div>
+      <div class="distress-track">
+        <div id="distress-fill" class="distress-fill" style="width:0%"></div>
+        <div class="distress-markers" aria-hidden="true">
+          <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+        </div>
+      </div>
+      <p id="distress-desc" class="distress-desc">Calm / Normal</p>
+    </div>
+
+    <!-- Transcript -->
+    <div class="transcript-wrapper">
+      <p class="transcript-heading">Conversation</p>
+      <div id="transcript" class="transcript" role="log" aria-live="polite" aria-label="Conversation transcript"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="active-actions">
+      <button id="btn-safe" class="btn btn-safe">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414
+               12.172l6.879-6.879a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+        I'm Safe
+      </button>
+      <button id="btn-emergency" class="btn btn-emergency">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd"
+            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213
+               2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11
+               13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1
+               1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        Emergency
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 3: ALERT SENT
+  ============================================================ -->
+  <section id="screen-alert" class="screen" hidden>
+    <div class="alert-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 11a1 1 0 0 1-1-1V8a1
+                 1 0 0 1 2 0v4a1 1 0 0 1-1 1zm0 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </svg>
+    </div>
+    <h2 class="alert-heading">Alert Sent!</h2>
+    <p class="alert-sub">Your emergency contact has been notified.</p>
+
+    <dl class="alert-details">
+      <div class="alert-detail-row">
+        <dt>Contact notified</dt>
+        <dd id="alert-contact">—</dd>
+      </div>
+      <div class="alert-detail-row">
+        <dt>Location shared</dt>
+        <dd id="alert-location">—</dd>
+      </div>
+      <div class="alert-detail-row">
+        <dt>Time</dt>
+        <dd id="alert-time">—</dd>
+      </div>
+    </dl>
+
+    <div class="alert-actions">
+      <button id="btn-cancel-alert" class="btn btn-safe">
+        I'm Actually Safe
+      </button>
+      <a id="btn-call-911" href="tel:911" class="btn btn-emergency">
+        Call 911
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 4: SAFE / SESSION SUMMARY
+  ============================================================ -->
+  <section id="screen-safe" class="screen" hidden>
+    <div class="safe-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd"
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12
+             2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"
+          clip-rule="evenodd"/>
+      </svg>
+    </div>
+    <h2 class="safe-heading">You're Home Safe!</h2>
+    <p class="safe-sub">Your walk has ended. Stay safe out there.</p>
+
+    <div class="summary-card">
+      <h3 class="summary-title">Session Summary</h3>
+      <dl class="summary-list">
+        <div class="summary-row">
+          <dt>Duration</dt>
+          <dd id="summary-duration">—</dd>
+        </div>
+        <div class="summary-row">
+          <dt>Alerts triggered</dt>
+          <dd id="summary-alerts">—</dd>
+        </div>
+        <div class="summary-row">
+          <dt>Peak distress level</dt>
+          <dd id="summary-peak">—</dd>
+        </div>
+        <div class="summary-row">
+          <dt>Transcript entries</dt>
+          <dd id="summary-transcript">—</dd>
+        </div>
+      </dl>
+    </div>
+
+    <button id="btn-new-walk" class="btn btn-primary btn-start">
+      Start New Walk
+    </button>
+  </section>
+
+</div><!-- /#app -->
+<script src="app.js"></script>
+</body>
+</html>
